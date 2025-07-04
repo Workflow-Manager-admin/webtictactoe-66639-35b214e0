@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import SnakeGame from './SnakeGame';
 
 /**
  * Minimalist Tic Tac Toe Board + Logic, Light Theme, Responsive
@@ -11,7 +12,6 @@ const COLORS = {
   secondary: '#388e3c',
   accent: '#ffb300',
 };
-
 /**
  * Calculate Winner
  * @param {Array} squares - current board state
@@ -42,10 +42,13 @@ function isDraw(squares) {
 
 /**
  * PUBLIC_INTERFACE
- * Tic Tac Toe Game App
+ * Tic Tac Toe Game App with Snake Navigation
  */
 function App() {
-  // X always goes first
+  // UI navigation: 'ttt' | 'snake'
+  const [view, setView] = useState('ttt');
+
+  // Tic Tac Toe State (preserved even when switching views)
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
 
@@ -68,9 +71,9 @@ function App() {
     setXIsNext(true);
   }
 
-  let statusMsg;
+  let tttStatusMsg;
   if (winner) {
-    statusMsg = (
+    tttStatusMsg = (
       <span>
         <strong style={{ color: COLORS.accent }}>
           {winner}
@@ -78,14 +81,77 @@ function App() {
       </span>
     );
   } else if (draw) {
-    statusMsg = <span>It's a draw!</span>;
+    tttStatusMsg = <span>It's a draw!</span>;
   } else {
-    statusMsg = (
+    tttStatusMsg = (
       <span>
         Next: <strong style={{ color: xIsNext ? COLORS.primary : COLORS.secondary }}>
           {xIsNext ? 'X' : 'O'}
         </strong>
       </span>
+    );
+  }
+
+  // Top navigation for game selection
+  function Nav() {
+    return (
+      <nav
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: COLORS.navbarBg,
+          borderBottom: `2.5px solid ${COLORS.boardBorder || '#e7eaf0'}`,
+          minHeight: 48,
+          padding: '0.4rem 0',
+          gap: 28,
+          boxShadow: '0 2px 8px rgba(25, 118, 210, 0.02)'
+        }}
+        aria-label="Main Navigation"
+      >
+        <button
+          aria-label="Show Tic Tac Toe"
+          style={{
+            border: 'none',
+            background: 'none',
+            fontWeight: 700,
+            fontSize: '1.14rem',
+            lineHeight: 1.4,
+            color: view === 'ttt' ? COLORS.primary : '#727272',
+            borderBottom: view === 'ttt' ? `2.7px solid ${COLORS.primary}` : 'none',
+            transition: 'color 0.17s, border 0.11s',
+            padding: '0 0 0.41rem 0',
+            letterSpacing: 0.7,
+            cursor: 'pointer',
+            outline: 'none'
+          }}
+          onClick={() => setView('ttt')}
+          tabIndex={0}
+        >
+          Tic Tac Toe
+        </button>
+        <button
+          aria-label="Show Snake Game"
+          style={{
+            border: 'none',
+            background: 'none',
+            fontWeight: 700,
+            fontSize: '1.11rem',
+            color: view === 'snake' ? COLORS.accent : '#727272',
+            borderBottom: view === 'snake' ? `2.7px solid ${COLORS.accent}` : 'none',
+            transition: 'color 0.17s, border 0.11s',
+            padding: '0 0 0.41rem 0',
+            letterSpacing: 0.7,
+            cursor: 'pointer',
+            outline: 'none'
+          }}
+          onClick={() => setView('snake')}
+          tabIndex={0}
+        >
+          Snake
+        </button>
+      </nav>
     );
   }
 
@@ -98,71 +164,87 @@ function App() {
         fontFamily: 'system-ui, sans-serif',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
         transition: 'background 0.3s'
       }}
     >
+      <Nav />
       <main
         style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          marginTop: 'min(7vw, 5rem)'
+          marginTop: 'min(7vw, 3.9rem)'
         }}
       >
-        <h1
-          style={{
-            margin: 0,
-            fontWeight: 700,
-            fontSize: '2rem',
-            letterSpacing: '-1px',
-            color: COLORS.primary,
-          }}
-        >Tic Tac Toe</h1>
-        <div
-          aria-live="polite"
-          aria-atomic="true"
-          style={{
-            margin: '1.2rem 0 1rem 0',
-            minHeight: 32,
-            fontSize: '1.1rem',
-            color: '#333',
-            textAlign: 'center',
-            fontWeight: 500,
-          }}
-        >
-          {statusMsg}
-        </div>
-        <TicTacToeBoard
-          squares={squares}
-          onClick={handleSquareClick}
-          winner={winner}
-        />
-
-        <button
-          type="button"
-          onClick={handleReset}
-          aria-label="Restart game"
-          style={{
-            display: 'block',
-            margin: '2rem auto 0 auto',
-            background: COLORS.primary,
-            color: '#fff',
-            fontWeight: 600,
-            fontSize: '1rem',
-            padding: '0.55rem 2.5rem',
-            border: 'none',
-            borderRadius: 7,
-            boxShadow: '0 2px 12px rgba(25, 118, 210, 0.08)',
-            cursor: 'pointer',
-            letterSpacing: 0.8,
-            transition: 'background 0.22s, filter 0.16s',
-          }}
-          tabIndex={0}
-        >
-          Reset Game
-        </button>
+        {view === 'ttt' && (
+          <>
+            <h1
+              style={{
+                margin: 0,
+                fontWeight: 700,
+                fontSize: '2rem',
+                letterSpacing: '-1px',
+                color: COLORS.primary,
+              }}
+            >Tic Tac Toe</h1>
+            <div
+              aria-live="polite"
+              aria-atomic="true"
+              style={{
+                margin: '1.2rem 0 1rem 0',
+                minHeight: 32,
+                fontSize: '1.1rem',
+                color: '#333',
+                textAlign: 'center',
+                fontWeight: 500,
+              }}
+            >
+              {tttStatusMsg}
+            </div>
+            <TicTacToeBoard
+              squares={squares}
+              onClick={handleSquareClick}
+              winner={winner}
+            />
+            <button
+              type="button"
+              onClick={handleReset}
+              aria-label="Restart game"
+              style={{
+                display: 'block',
+                margin: '2rem auto 0 auto',
+                background: COLORS.primary,
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '1rem',
+                padding: '0.55rem 2.5rem',
+                border: 'none',
+                borderRadius: 7,
+                boxShadow: '0 2px 12px rgba(25, 118, 210, 0.08)',
+                cursor: 'pointer',
+                letterSpacing: 0.8,
+                transition: 'background 0.22s, filter 0.16s',
+              }}
+              tabIndex={0}
+            >
+              Reset Game
+            </button>
+          </>
+        )}
+        {view === 'snake' && (
+          <>
+            <h1
+              style={{
+                margin: 0,
+                fontWeight: 700,
+                fontSize: '2rem',
+                color: COLORS.accent,
+                letterSpacing: '-1px',
+              }}
+            >Snake</h1>
+            <SnakeGame />
+          </>
+        )}
       </main>
       <footer
         style={{
