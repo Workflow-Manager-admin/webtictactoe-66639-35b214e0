@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 import SnakeGame from './SnakeGame';
+import DivisionGame from './DivisionGame';
 
 /**
  * Minimalist Tic Tac Toe Board + Logic, Light Theme, Responsive
@@ -11,6 +12,8 @@ const COLORS = {
   primary: '#1976d2',
   secondary: '#388e3c',
   accent: '#ffb300',
+  navbarBg: '#fffbe7',
+  boardBorder: '#e7eaf0'
 };
 /**
  * Calculate Winner
@@ -42,10 +45,10 @@ function isDraw(squares) {
 
 /**
  * PUBLIC_INTERFACE
- * Tic Tac Toe Game App with Snake Navigation
+ * Tic Tac Toe Game App with Snake/Division Navigation
  */
 function App() {
-  // UI navigation: 'ttt' | 'snake'
+  // UI navigation: 'ttt' | 'snake' | 'division'
   const [view, setView] = useState('ttt');
 
   // Tic Tac Toe State (preserved even when switching views)
@@ -94,6 +97,23 @@ function App() {
 
   // Top navigation for game selection
   function Nav() {
+    const navItems = [
+      {
+        label: 'Tic Tac Toe',
+        key: 'ttt',
+        color: COLORS.primary,
+      },
+      {
+        label: 'Snake',
+        key: 'snake',
+        color: COLORS.accent,
+      },
+      {
+        label: 'Division',
+        key: 'division',
+        color: COLORS.secondary,
+      }
+    ];
     return (
       <nav
         style={{
@@ -110,47 +130,30 @@ function App() {
         }}
         aria-label="Main Navigation"
       >
-        <button
-          aria-label="Show Tic Tac Toe"
-          style={{
-            border: 'none',
-            background: 'none',
-            fontWeight: 700,
-            fontSize: '1.14rem',
-            lineHeight: 1.4,
-            color: view === 'ttt' ? COLORS.primary : '#727272',
-            borderBottom: view === 'ttt' ? `2.7px solid ${COLORS.primary}` : 'none',
-            transition: 'color 0.17s, border 0.11s',
-            padding: '0 0 0.41rem 0',
-            letterSpacing: 0.7,
-            cursor: 'pointer',
-            outline: 'none'
-          }}
-          onClick={() => setView('ttt')}
-          tabIndex={0}
-        >
-          Tic Tac Toe
-        </button>
-        <button
-          aria-label="Show Snake Game"
-          style={{
-            border: 'none',
-            background: 'none',
-            fontWeight: 700,
-            fontSize: '1.11rem',
-            color: view === 'snake' ? COLORS.accent : '#727272',
-            borderBottom: view === 'snake' ? `2.7px solid ${COLORS.accent}` : 'none',
-            transition: 'color 0.17s, border 0.11s',
-            padding: '0 0 0.41rem 0',
-            letterSpacing: 0.7,
-            cursor: 'pointer',
-            outline: 'none'
-          }}
-          onClick={() => setView('snake')}
-          tabIndex={0}
-        >
-          Snake
-        </button>
+        {navItems.map((item) => (
+          <button
+            key={item.key}
+            aria-label={`Show ${item.label} Game`}
+            style={{
+              border: 'none',
+              background: 'none',
+              fontWeight: 700,
+              fontSize: '1.13rem',
+              lineHeight: 1.4,
+              color: view === item.key ? item.color : '#727272',
+              borderBottom: view === item.key ? `2.7px solid ${item.color}` : 'none',
+              transition: 'color 0.17s, border 0.11s',
+              padding: '0 0 0.41rem 0',
+              letterSpacing: 0.7,
+              cursor: 'pointer',
+              outline: 'none'
+            }}
+            onClick={() => setView(item.key)}
+            tabIndex={0}
+          >
+            {item.label}
+          </button>
+        ))}
       </nav>
     );
   }
@@ -244,6 +247,9 @@ function App() {
             >Snake</h1>
             <SnakeGame />
           </>
+        )}
+        {view === 'division' && (
+          <DivisionGame />
         )}
       </main>
       <footer
